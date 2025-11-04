@@ -19,9 +19,29 @@ bounding_box = {
 }
 
 while True:
+    # Grabbing screen data
     sct_img = sct.grab(bounding_box)
-    cv2.imshow('screen', np.array(sct_img))
 
+    # Convert to PIL Image
+    frame = np.array(sct_img)
+
+    # Converteer naar grijs
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGRA2GRAY)
+
+    # Canny edge detection toepassen
+    edges = cv2.Canny(gray, 50, 100,) 
+
+    # Converting to NumPy array and displaying
+    cv2.imshow('screen', np.array(sct_img))
+    
+    # Toon het resultaat
+    cv2.imshow('Edges', edges)
+
+
+
+
+
+    # Stoppen met 'q'
     if (cv2.waitKey(1) & 0xFF) == ord('q'):
         cv2.destroyAllWindows()
         break
