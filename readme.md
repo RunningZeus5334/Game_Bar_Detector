@@ -34,10 +34,15 @@ Materials
 - ws2812 ledstrip
 - lots of motivation
 
-### How to run:
+### How to run Windows:
 1. install python 3.12.10
-2. ``python -m venv ~\vm``
+2. ``python -m venv .\vm``
 3. (if venv isnt activated) -> ``vm\Scripts\activate``
 4. If you get a security error like “execution of scripts is disabled” -> ``Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass``
 5. ``pip install -r requirements.txt``
 
+### How to run Linux debian based:
+1. install python 3.12.10
+2. ``python -m venv \vm``
+3. ``source vm/bin/activate``
+4. ``pip install -r requirements.txt``
