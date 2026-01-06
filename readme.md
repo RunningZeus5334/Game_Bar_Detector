@@ -1,4 +1,5 @@
 # Game_Bar_Detector
+![Gif of result](./Resources/Result.gif)\
 **Project maker: Thomas Fokkema**\
 This project connects real-time game data to physical LEDs using computer vision and a Raspberry Pi Pico W. We automatically detect on-screen status bars (like health, mana and stamina in Elden Ring) and visualize them using WS2812 LEDs.
 ### ⚙️ How it works
@@ -28,11 +29,30 @@ Developing this system introduces several technical challenges:
 
 ### 🌈 Result
 Once fine-tuned, the result is an immersive system that extends the game beyond the screen. A responsive LED lights that visually represents your in-game health, armor, or stamina in real time. It’s both a fun visual project and a great introduction to computer vision, microcontrollers, and real-time data streaming.
-Materials
+
+### 🔧 Materials
 - Powerfull processing machine
 - Raspberry pi pico W
 - ws2812 ledstrip
-- lots of motivation
+- level shifter
+- Some wires and a breadboard
+
+### 🌊 Code flow
+Health Bar Detection Script
+Captures screen and detects health bars using edge detection and color analysis.
+Tracks detected bars for 60 seconds, then locks onto the most frequently detected ROIs.
+
+**Code Flow**
+1. **Capture:** `Code/Screen_Capture.py` or `Code/Screen_Capture_rgb.py` continuously captures the chosen monitor using `mss` and converts frames to BGR images for OpenCV processing.
+2. **Preprocess:** Each frame is converted to grayscale, blurred and run through Canny edge detection to find candidate contours (potential bars).
+3. **Candidate filtering:** Contours are filtered by aspect ratio and size to find long, thin ROIs likely to be status bars.
+4. **Color analysis:** For each candidate ROI the code computes a masked reference color (BGR) and uses either grayscale thresholds (for white bars) or per-pixel Euclidean color distance to the ROI mean to compute a fill ratio.
+5. **Tracking & confirmation:** During a 60-second tracking phase the script records normalized ROIs. After the period it selects the most frequently seen ROIs as `confirmed_rois` and stores a reference color per confirmed ROI.
+6. **Assignment:** Confirmed ROIs are mapped positionally (left → bar 1, middle → bar 2, right → bar 3). You can also override the output color for each bar with command-line flags.
+7. **Fill measurement:** On each frame the script measures how many pixels in the confirmed ROI still match the stored reference color (fill ratio), and maps that to an LED count (0–8).
+8. **LED output:** A small `Code/pico_client.py` module opens a serial connection to the Pico and sends `SET <strip> <count> <r> <g> <b>` commands when a bar's LED count or color changes.
+9. **Instrumentation & tuning:** Timing instrumentation records step durations and can write a CSV (`timing_log.csv` / `timing_log_rgb.csv`). A live `Controls` window exposes thresholds (std, color distance, fill %, white threshold) as OpenCV trackbars for real-time tuning.
+10. **Visualization:** The detection window draws candidate ROIs, confirmed tracked ROIs (with a stored color swatch and assigned bar number), and a small Controls UI for live tweaks.
 
 ### How to run Windows:
 1. install python 3.12.10
@@ -46,3 +66,4 @@ Materials
 2. ``python -m venv \vm``
 3. ``source vm/bin/activate``
 4. ``pip install -r requirements.txt``
+
